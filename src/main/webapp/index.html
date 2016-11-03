@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HELLO</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    <script src="js/maincontroller.js"></script>
+
+    <style>
+        table, th , td {
+            border: 1px solid grey;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+        table tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body ng-app="mainApp" ng-controller="mainController">
+<p><h3>Time: {{theTime}} | SVAR: {{dbReply}}</h3></p>
+<hr>
+<form>
+    ADD NAME<br>
+    NAME: <input type="text" name="insertthis" ng-model="pname">
+    <!--<input type="text" name="insertthisteam" ng-model="pnameteam">-->
+    <br><input type="submit" ng-click="addPerson()" value="ADD">
+</form>
+Reply: {{addResult}}
+<p></p>
+<form>
+    FIND BY ID<br>
+    ID: <input type="text" name="inSearchId" ng-model="searchedId"><br>
+    <input type="submit" ng-click="getNameById()" value="GET"><br>
+</form>
+Found: {{searchResult}}
+<p></p>
+<form>
+    UPDATE BY ID: <br>
+    ID: <input type="text" name="inUpdateId" ng-model="idToUpdate"><br>
+    NAME: <input type="text" name="inUpdateName" ng-model="newName"><br>
+    <input type="submit" ng-click="updateNameById()" value="UPDATE"><br>
+</form>
+Reply: {{updateResult}}
+<p></p>
+<form>
+    UPDATE TEAM BY PERSONID: <br>
+    ID: <input type="text" name="inUpdateId2" ng-model="idToUpdate2"><br>
+    TEAM ID: <input type="text" name="inUpdateTeamId" ng-model="newTeamId"><br>
+    <input type="submit" ng-click="updateTeamByPersonId()" value="UPDATE TEAM"><br>
+</form>
+Reply: {{updateTeamResult}}
+<p></p>
+<form>
+    DELETE BY ID<br>
+    ID: <input type="text" name="inDeleteId" ng-model="idToDelete"><br>
+    <input type="submit" ng-click="deleteById()" value="DELETE">
+</form>
+Reply: {{deleteResult}}
+<p></p>
+<form>
+    ADD TEAM<br>
+    TEAMNAME: <input type="text" name="insertteam" ng-model="tname"><br>
+    SHORT TEAMNAME: <input type="text" name="insertteamshort" ng-model="shorttname"><br>
+    <!--<input type="text" name="insertthisteam" ng-model="pnameteam">-->
+    <input type="submit" ng-click="addTeam()" value="ADD TEAM"><br>
+</form>
+Reply: {{addTeamResult}}
+<p></p>
+<form>
+    DELETE TEAM BY ID<br>
+    ID: <input type="text" name="inDeleteTeamId" ng-model="teamIdToDelete"><br>
+    <input type="submit" ng-click="deleteTeamById()" value="DELETE TEAM">
+</form>
+Reply: {{deleteTeamResult}}
+<hr>
+
+<p><button ng-click="getAllNames()">getAllNames()</button></p>
+
+<!--<ul>
+    <li ng-repeat="x in dbReply">
+        {{x.personid + ': ' + x.personname}}
+    </li>
+</ul>-->
+
+<table ng-mouseenter="getAllNames()">
+    <tr>
+        <th>personid</th>
+        <th>personname</th>
+        <th>teamid</th>
+        <th>teamname</th>
+    </tr>
+    <tr ng-repeat = "p in personList">
+        <td>{{ p.personid }}</td>
+        <td>{{ p.personname }}</td>
+        <td>{{ p.team.id }}</td>
+        <td>{{ p.team.teamName }}</td>
+    </tr>
+</table>
+
+<table ng-mouseenter="getAllTeams()">
+    <tr>
+        <th>teamid</th>
+        <th>teamname</th>
+        <th>shortteamname</th>
+    </tr>
+    <tr ng-repeat = "t in teamList">
+        <td>{{ t.id }}</td>
+        <td>{{ t.teamName }}</td>
+        <td>{{ t.shortName }}</td>
+    </tr>
+</table>
+
+<hr>
+
+<p><button ng-click="halp()">halp</button></p>
+<!--<script>
+    function halp() {
+        alert("I am an alert box!");
+    }
+</script>-->
+
+</body>
+</html>

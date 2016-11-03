@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Angular lab</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <!--<script src="js/myApp.js"></script>-->
+    <!--<script src="js/myCtrl.js"></script>-->
+    <script src="js/controller.js"></script>
+</head>
+<style>
+    input.ng-invalid {
+        background-color: red;
+    }
+</style>
+<body>
+<!--<script>
+    var app = angular.module('myApp', []);
+    app.controller('myCtrl', function($scope, $http, $timeout) {
+        $scope.firstName = "John";
+        $scope.lastName = "Doe";
+        $scope.fullName = function() {
+            return $scope.firstName + " " + $scope.lastName;
+        };
+        $scope.even=[2,4,6,8,10];
+        $scope.odd=[1,3,5,7,9];
+        $scope.vehicles=['bil', 'cykel', 'båt', 'flygplan', 'tåg'];
+        $scope.persons=[
+            {name:'Jani',country:'Norway'},
+            {name:'Hege',country:'Sweden'},
+            {name:'Kai',country:'Denmark'}];
+        $scope.changeName = function(){
+            $scope.firstName = "Jan";
+        };
+        $http.get("http://localhost:8080/Tee-1.0-SNAPSHOT/api/get/all").then(function(response){
+            $scope.returnMsg = response.data;
+        });
+        $scope.myCountDown = 4;
+        $timeout(function(){
+            $scope.myCountDown = 3;
+        }, 3000);
+        $timeout(function(){
+            $scope.myCountDown = 2;
+        }, 4000);
+        $timeout(function(){
+            $scope.myCountDown = 1;
+        }, 5000);
+        $timeout(function(){
+            $scope.myCountDown = "?!";
+        }, 6000);
+    });
+</script>-->
+
+<div ng-app="myApp" ng-controller="myCtrl" ng-init="middleName='middlename';myColor='green';
+object1={first:'A', second:'B'}">
+
+
+    <!--<form action="http://localhost:8080/Tee-1.0-SNAPSHOT/api/add/" method="get">-->
+    <form>
+        Name:<br>
+        <input type="text" name="angularname" ng-model="pname">
+        <br><br>
+        <!--<input ng-click="addPerson()" type="submit" value="Submit">-->
+        <!--<button ng-click="addPerson()">Send it</button>-->
+        <button ng-click="addPerson()">Send it</button>
+    </form>
+    <p>{{"http://localhost:8080/Tee-1.0-SNAPSHOT/api/add/"+pname}}</p>
+    <h1>return on add: {{returnOnAdd}}</h1>
+
+    <!--<hr>-->
+    <h1>Time: {{theTime}}</h1>
+    <h1>Countdown: {{myCountDown}}</h1>
+
+    <button ng-click="getAllNames()">getAllNames()</button>
+    <p>http response from http://localhost:8080/Tee-1.0-SNAPSHOT/api/get/all: </p>
+    <h1>{{returnMsg}}</h1>
+
+    First Name: <input type="text" ng-model="firstName" required><br>
+    Last Name: <input type="text" ng-model="lastName" required><br>
+
+    <h1 ng-click="changeName()">{{firstName}}</h1><p>
+    <h1 ng-click="changeLastName()">{{lastName}}</h1><p></p>
+    <p>Click on the header to run the "changeName" function.</p>
+    <p>This example demonstrates how to use the controller to change model data.</p>
+    <br>
+    <!--Full Name (from function): {{fullName()}}
+    <br> eller-->
+
+    <br> {{firstName + " " + middleName + " " + lastName + " " + object1.first + " " + object1.second}} åker i {{vehicles[0]}}
+
+    <p> 1 + even[0] + odd[0] = {{1+even[0]+odd[0]}}
+
+    <p> <input style="background-color:{{myColor}}" ng-model="myColor" value="{{myColor}}"></p>
+
+    EVEN
+    <ul>
+        <li ng-repeat="x in even">
+            {{x}}
+        </li>
+    </ul>
+
+    PERSON OBJECTS
+    <ul>
+        <li ng-repeat="p in persons">
+            {{ p.name + ', ' + p.country }}
+        </li>
+    </ul>
+
+    <form ng-app="" name="myForm" ng-init="myText = 'a@b.c'">
+
+        <p>Enter your e-mail address in the input field. AngularJS will display an errormessage if the address is not an e-mail.</p>
+        <p>Edit the e-mail address, and try to change the status.</p>
+        <p>Edit the text field and it will get/lose classes according to the status.</p>
+        <p><b>Note:</b> A text field with the "required" attribute is not valid when it is empty.</p>
+        Email:
+        <input type="email" name="myAddress" ng-model="myText" required>
+        <span ng-show="myForm.myAddress.$error.email">Not a valid e-mail address</span>
+
+
+        <h1>Status</h1>
+        <p>Valid: {{myForm.myAddress.$valid}} (if true, the value meets all criteria).</p>
+        <p>Dirty: {{myForm.myAddress.$dirty}} (if true, the value has been changed).</p>
+        <p>Touched: {{myForm.myAddress.$touched}} (if true, the field has been in focus).</p>
+    </form>
+
+</div>
+
+</body>
+</html>
