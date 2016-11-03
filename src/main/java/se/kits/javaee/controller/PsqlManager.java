@@ -52,6 +52,8 @@ public class PsqlManager {
         return em.createQuery("select t from Team t").getResultList();
     }
 
+        return getTeamById(teamid).getMembersList();
+
     public int updateNameById(int id, String name){
         return em.createQuery("update Person p set p.personname = :name where p.personid = :id")
                 .setParameter("id", id).setParameter("name", name).executeUpdate();
