@@ -25,6 +25,7 @@ public class Team implements Serializable{
     @Column(name="shortname")
     private String shortName;
 
+    @OneToMany(mappedBy="team")
     private List<Person> membersList;
 
     public Team(){}
