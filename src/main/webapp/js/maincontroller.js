@@ -6,21 +6,20 @@ app.controller('mainController', function($scope, $http, $interval) {
 
     $scope.dbReply = "";
     $scope.pname = "glader";
-    $scope.restURL = "http://localhost:8080/Tee-1.0-SNAPSHOT/api/";
     // $scope.searchedId = 0;
     // $scope.idToUpdate = "";
     // $scope.newName = "";
     // $scope.idToDelete=-1;
 
     $scope.addPerson = function(){
-        $http.get($scope.restURL + "add/"+$scope.pname).then(function(response){
+        $http.get("http://localhost:8080/Tee-1.0-SNAPSHOT/api/add/"+$scope.pname).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.addResult = response.data;
         });
     };
 
     $scope.addTeam = function(){
-        $http.get($scope.restURL + "addteam/"
+        $http.get("http://localhost:8080/Tee-1.0-SNAPSHOT/api/addteam/"
             + $scope.tname + "/" + $scope.shorttname).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.addTeamResult = response.data;
@@ -29,14 +28,14 @@ app.controller('mainController', function($scope, $http, $interval) {
 
     $scope.getNameById = function(){
 
-        $http.get($scope.restURL + "get/"+$scope.searchedId).then(function(response){
+        $http.get("http://localhost:8080/Tee-1.0-SNAPSHOT/api/get/"+$scope.searchedId).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.searchResult = response.data;
         });
     };
 
     $scope.getAllNames = function () {
-        $http.get($scope.restURL + "get/all").then(function(response){
+        $http.get("http://localhost:8080/Tee-1.0-SNAPSHOT/api/get/all").then(function(response){
             // $http.get("/api/get/all").then(function(response){
             $scope.dbReply = response.statusText;
             $scope.personList = response.data;
@@ -45,7 +44,7 @@ app.controller('mainController', function($scope, $http, $interval) {
     };
 
     $scope.getAllTeams = function () {
-        $http.get($scope.restURL + "get/allteams").then(function(response){
+        $http.get("http://localhost:8080/Tee-1.0-SNAPSHOT/api/get/allteams").then(function(response){
             // $http.get("/api/get/all").then(function(response){
             $scope.dbReply = response.statusText;
             $scope.teamList = response.data;
@@ -55,7 +54,7 @@ app.controller('mainController', function($scope, $http, $interval) {
 
     $scope.updateNameById = function () {
 
-        $http.get($scope.restURL + "update/"
+        $http.get("http://localhost:8080/Tee-1.0-SNAPSHOT/api/update/"
             + $scope.idToUpdate + '/' + $scope.newName).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.updateResult = response.data;
@@ -64,7 +63,7 @@ app.controller('mainController', function($scope, $http, $interval) {
 
     $scope.updateTeamByPersonId = function () {
 
-            $http.get($scope.restURL + "updateteam/"
+            $http.get("http://localhost:8080/Tee-1.0-SNAPSHOT/api/updateteam/"
                 + $scope.idToUpdate2 + '/' + $scope.newTeamId).then(function(response){
                 $scope.dbReply = response.statusText;
                 $scope.updateTeamResult = response.data;
@@ -74,7 +73,7 @@ app.controller('mainController', function($scope, $http, $interval) {
 
     $scope.deleteById = function(){
 
-        $http.get($scope.restURL + "delete/"
+        $http.get("http://localhost:8080/Tee-1.0-SNAPSHOT/api/delete/"
             + $scope.idToDelete).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.deleteResult = response.data;
@@ -83,7 +82,7 @@ app.controller('mainController', function($scope, $http, $interval) {
 
     $scope.deleteTeamById = function(){
 
-            $http.get($scope.restURL + "deleteteam/"
+            $http.get("http://localhost:8080/Tee-1.0-SNAPSHOT/api/deleteteam/"
                 + $scope.teamIdToDelete).then(function(response){
                 $scope.dbReply = response.statusText;
                 $scope.deleteTeamResult = response.data;

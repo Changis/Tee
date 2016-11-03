@@ -89,6 +89,8 @@ public class RestController {
             //return ex.toString();
             return Response.serverError().build();
         }
+
+        //return ""+id;
     }
 
     @Path("/get/all")
@@ -97,7 +99,13 @@ public class RestController {
     @Produces(APPLICATION_JSON)
     public Response listAll(){
         try{
-            return Response.ok(dbm.listAll()).build();
+            List<Person> l = dbm.listAll();
+            /*StringBuilder sb = new StringBuilder();
+            for(Person p : l){
+                sb.append(p.getPersonname() + "\n");
+            }
+            return Response.ok(sb.toString()).build();*/
+            return Response.ok(l).build();
         }catch(Exception ex){
             return Response.ok(ex.toString()).build();
         }
@@ -110,7 +118,13 @@ public class RestController {
     @Produces(APPLICATION_JSON)
     public Response listAllTeams(){
         try{
-            return Response.ok(dbm.listAllTeams()).build();
+            List<Team> l = dbm.listAllTeams();
+            /*StringBuilder sb = new StringBuilder();
+            for(Person p : l){
+                sb.append(p.getPersonname() + "\n");
+            }
+            return Response.ok(sb.toString()).build();*/
+            return Response.ok(l).build();
         }catch(Exception ex){
             return Response.ok(ex.toString()).build();
         }
@@ -122,7 +136,8 @@ public class RestController {
     @Consumes(APPLICATION_JSON)
     @Produces(TEXT_PLAIN)
     public Response updateNameById(@PathParam("id") int id, @PathParam("name") String name){
-        return Response.ok(dbm.updateNameById(id, name) + " rows updated").build();
+        int updatedRows = dbm.updateNameById(id, name);
+        return Response.ok(updatedRows + " rows updated").build();
     }
 
     @Path("/updateteam/{personid}/{teamid}")
@@ -130,6 +145,7 @@ public class RestController {
     @Consumes(APPLICATION_JSON)
     @Produces(TEXT_PLAIN)
     public Response updateTeamByPersonId(@PathParam("personid") int personid, @PathParam("teamid") int teamid){
+        int updatedRows = 0;
         Person p;
         try {
             p = dbm.updateTeamByPersonId(personid, teamid);
@@ -145,7 +161,8 @@ public class RestController {
     @Consumes(APPLICATION_JSON)
     @Produces(TEXT_PLAIN)
     public Response deleteById(@PathParam("id") int id){
-        return Response.ok(dbm.deletePersonById(id) + " rows deleted").build();
+        int deletedRows = dbm.deletePersonById(id);
+        return Response.ok(deletedRows + " rows deleted").build();
     }
 
     @Path("/deleteteam/{id}")
@@ -160,6 +177,7 @@ public class RestController {
     @Path("/post/add/{name}/{teamid}")
     @POST
     @Consumes(APPLICATION_JSON)
+    //@Produces(APPLICATION_JSON)
     @Produces(TEXT_HTML)
     public Response registerPerson(@PathParam("name") String name, @PathParam("teamid") int id){
         Person p = dbm.registerPerson(name);
