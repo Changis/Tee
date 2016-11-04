@@ -53,7 +53,9 @@ public class PsqlManager {
     }
 
     public List listAllMembers(int teamid) throws Exception{
-        return getTeamById(teamid).getMembersList();
+        //return getTeamById(teamid).getMembersList();
+        return em.createQuery("SELECT p FROM Person p join p.teammember t where t.id = :teamid")
+                .setParameter("teamid", teamid).getResultList();
     }
 
     public int updateNameById(int id, String name){
