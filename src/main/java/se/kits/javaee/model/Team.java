@@ -3,6 +3,7 @@ package se.kits.javaee.model;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by David Chang on 2016-11-02.
@@ -23,6 +24,9 @@ public class Team implements Serializable{
 
     @Column(name="shortname")
     private String shortName;
+
+    @OneToMany(mappedBy="team")
+    private List<Person> membersList;
 
     public Team(){}
 
@@ -57,5 +61,13 @@ public class Team implements Serializable{
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public List<Person> getMembersList() {
+        return membersList;
+    }
+
+    public void setMembersList(List<Person> membersList) {
+        this.membersList = membersList;
     }
 }
