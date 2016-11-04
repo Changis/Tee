@@ -25,8 +25,8 @@ public class Team implements Serializable{
     @Column(name="shortname")
     private String shortName;
 
-//    @OneToMany(mappedBy="team")
-//    private List<Person> membersList;
+    @OneToMany(mappedBy="team")
+    private List<Person> membersList;
 
     public Team(){}
 
@@ -61,5 +61,13 @@ public class Team implements Serializable{
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public List<Person> getMembersList() {
+        return membersList;
+    }
+
+    public void setMembersList(List<Person> membersList) {
+        this.membersList = membersList;
     }
 }
