@@ -57,23 +57,23 @@ public class RestController {
     @Path("/add/{name}")
     @GET
     @Consumes(APPLICATION_JSON)
-    //@Produces(APPLICATION_JSON)
-    @Produces(TEXT_HTML)
+    @Produces(APPLICATION_JSON)
+    //@Produces(TEXT_HTML)
     public Response registerPerson(@PathParam("name") String name){
-        dbm.registerPerson(name);
+        return Response.ok(dbm.registerPerson(name)).build();
+//        return Response.ok(name + " was (hopefully) added to dcdb/person").build();
         //return Response.created(URI.create("/rest/" + p.getPersonid())).build();
-        return Response.ok(name + " was (hopefully) added to dcdb/person").build();
+
     }
 
 
     @Path("/addteam/{name}/{shortname}")
     @GET
     @Consumes(APPLICATION_JSON)
-    @Produces(TEXT_HTML)
+    @Produces(APPLICATION_JSON)
     public Response registerTeam(@PathParam("name") String name, @PathParam("shortname") String shortname){
-        dbm.registerTeam(name, shortname);
         //return Response.created(URI.create("/rest/" + p.getPersonid())).build();
-        return Response.ok(name + " was (hopefully) added to dcdb/team").build();
+        return Response.ok(dbm.registerTeam(name, shortname)).build();
     }
 
 

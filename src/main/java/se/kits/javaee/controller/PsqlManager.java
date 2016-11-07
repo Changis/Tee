@@ -5,19 +5,20 @@ package se.kits.javaee.controller;
 import se.kits.javaee.model.Person;
 import se.kits.javaee.model.Team;
 
+import javax.ejb.Stateful;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceContext;
+import javax.persistence.*;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by David Chang on 2016-10-17.
  */
 @Stateless
+//@Stateful
 public class PsqlManager {
 
+    //@PersistenceContext(unitName = "postgresjpu", type = PersistenceContextType.EXTENDED)
     @PersistenceContext(unitName = "postgresjpu")
     private EntityManager em;
 
@@ -53,9 +54,8 @@ public class PsqlManager {
     }
 
     public List listAllMembers(int teamid) throws Exception{
-        //return getTeamById(teamid).getMembersList();
-        return em.createQuery("SELECT p FROM Person p join p.teammember t where t.id = :teamid")
-                .setParameter("teamid", teamid).getResultList();
+        Team t = em.find(Team.class, teamid);
+        return t.getMembersList();
     }
 
     public int updateNameById(int id, String name){
@@ -66,6 +66,7 @@ public class PsqlManager {
     public Person updateTeamByPersonId(int personid, int teamid) throws Exception{
         Person p = showPersonById(personid);
         p.setTeam(getTeamById(teamid));
+
         return em.merge(p);
         /*return em.createQuery("update Person p set p.teamid = :teamid where p.personid = :personid")
                 .setParameter("personid", personid).setParameter("teamid", teamid).executeUpdate();*/
