@@ -1,5 +1,8 @@
 package se.kits.javaee.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -37,6 +40,8 @@ public class Person implements Serializable{
 
     @ManyToOne
     @JoinColumn(name="teamid")
+    //@JsonBackReference
+    @JsonManagedReference
     private Team team;
 
     /*@ManyToOne
@@ -85,4 +90,12 @@ public class Person implements Serializable{
     public void setTeam(Team team) {
         this.team = team;
     }
+
+    /*    public int getTeamid() {
+        return teamid;
+    }
+
+    public void setTeamid(int teamid) {
+        this.teamid = teamid;
+    }*/
 }
