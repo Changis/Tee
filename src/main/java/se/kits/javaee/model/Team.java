@@ -1,5 +1,8 @@
 package se.kits.javaee.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -25,7 +28,10 @@ public class Team implements Serializable{
     @Column(name="shortname")
     private String shortName;
 
-    @OneToMany(mappedBy="team")
+//    @OneToMany(mappedBy="team", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    @OneToMany(mappedBy="team", fetch=FetchType.EAGER)
+    //@JsonManagedReference
+    @JsonBackReference
     private List<Person> membersList;
 
     public Team(){}

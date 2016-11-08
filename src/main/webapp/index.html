@@ -31,7 +31,7 @@
     <!--<input type="text" name="insertthisteam" ng-model="pnameteam">-->
     <br><input type="submit" ng-click="addPerson()" value="ADD">
 </form>
-Reply: {{addResult}}
+Reply: added personid: {{addResult.personid}}
 <p></p>
 <form>
     FIND BY ID<br>
@@ -70,14 +70,35 @@ Reply: {{deleteResult}}
     <!--<input type="text" name="insertthisteam" ng-model="pnameteam">-->
     <input type="submit" ng-click="addTeam()" value="ADD TEAM"><br>
 </form>
-Reply: {{addTeamResult}}
+Reply: added team with id: {{addTeamResult.id}}
 <p></p>
 <form>
     DELETE TEAM BY ID<br>
-    ID: <input type="text" name="inDeleteTeamId" ng-model="teamIdToDelete"><br>
+    TEAM ID: <input type="text" name="inDeleteTeamId" ng-model="teamIdToDelete"><br>
     <input type="submit" ng-click="deleteTeamById()" value="DELETE TEAM">
 </form>
 Reply: {{deleteTeamResult}}
+
+<p></p>
+<form>
+    LIST MEMBERS BY TEAM ID<br>
+    TEAM ID: <input type="text" name="membersListSearch" ng-model="membersListById"><br>
+    <input type="submit" ng-click="getMembersList()" value="LIST MEMBERS">
+</form>
+<table>
+    <tr>
+        <th>personid</th>
+        <th>personname</th>
+        <th>teamid</th>
+        <th>teamname</th>
+    </tr>
+    <tr ng-repeat = "teammember in getMembersListResult">
+        <td>{{ teammember.personid }}</td>
+        <td>{{ teammember.personname }}</td>
+        <td>{{ teammember.team.id }}</td>
+        <td>{{ teammember.team.teamName }}</td>
+    </tr>
+</table>
 <hr>
 
 <p><button ng-click="getAllNames()">getAllNames()</button></p>
