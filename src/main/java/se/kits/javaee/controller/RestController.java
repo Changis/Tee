@@ -63,7 +63,6 @@ public class RestController {
         return Response.ok(dbm.registerPerson(name)).build();
 //        return Response.ok(name + " was (hopefully) added to dcdb/person").build();
         //return Response.created(URI.create("/rest/" + p.getPersonid())).build();
-        
     }
 
 
