@@ -53,6 +53,13 @@ app.controller('mainController', function($scope, $http, $interval) {
         });
     };
 
+    $scope.getMembersList = function () {
+        $http.get($scope.restURL + "getmembers/" + $scope.membersListById).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.getMembersListResult = response.data;
+        });
+    };
+
     $scope.updateNameById = function () {
 
         $http.get($scope.restURL + "update/"
