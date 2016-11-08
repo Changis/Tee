@@ -64,7 +64,7 @@ public class RestController {
 //        return Response.ok(name + " was (hopefully) added to dcdb/person").build();
         //return Response.created(URI.create("/rest/" + p.getPersonid())).build();
     }
-    
+
     @Path("/addteam/{name}/{shortname}")
     @GET
     @Consumes(APPLICATION_JSON)
