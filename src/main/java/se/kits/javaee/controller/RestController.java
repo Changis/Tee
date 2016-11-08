@@ -74,7 +74,6 @@ public class RestController {
         return Response.ok(dbm.registerTeam(name, shortname)).build();
     }
 
-
     @Path("/get/{id}")
     @GET
     @Consumes(APPLICATION_JSON)
