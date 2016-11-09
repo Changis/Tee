@@ -98,7 +98,6 @@ public class RestController {
         }catch(Exception ex){
             return Response.ok(ex.toString()).build();
         }
-
     }
 
     @Path("/get/allteams")
@@ -119,11 +118,11 @@ public class RestController {
     @Produces(APPLICATION_JSON)
     public Response listAllMembers(@PathParam("teamid") int teamid){
         try {
-                return Response.ok(dbm.listAllMembers(teamid)).build();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return Response.serverError().build();
-            }
+            return Response.ok(dbm.listAllMembers(teamid)).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
     }
 
     @Path("/update/{id}/{name}")
