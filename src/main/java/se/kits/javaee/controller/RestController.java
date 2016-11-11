@@ -3,8 +3,10 @@ package se.kits.javaee.controller;
 import se.kits.javaee.model.Person;
 import se.kits.javaee.model.Team;
 
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.*;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +33,12 @@ public class RestController {
 
     @Inject
     private MysqlManager dbm2;
+
+    @Resource(lookup = "java:/myJmsTest/MyConnectionFactory")
+    private ConnectionFactory connectionFactory;
+
+    @Resource(lookup = "java:/myJmsTest/MyQueue")
+    private Destination destination;
 
     /* How to return a HTML.
     TO DO: Adress to HTML file in webapp folder */
@@ -175,4 +183,47 @@ public class RestController {
         return Response.ok(name + " was (hopefully) added to dcdb/person").build();
     }
 
+    @Path("/senddefaultmsg")
+    @GET
+    public void sendMsg(){
+        try {
+            Connection connection = connectionFactory.createConnection("myJmsUser", "myJmsPassword");
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageProducer producer = session.createProducer(destination);
+            TextMessage message = session.createTextMessage();
+            message.setText("This is the message");
+            producer.send(message);
+            producer.close();
+            session.close();
+            connection.close();
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    @Path("/getmsg")
+    @GET
+    @Produces(TEXT_PLAIN)
+    public Response getMsg(){
+        String str = "failed msg consumption";
+        try {
+            Connection connection = connectionFactory.createConnection("myJmsUser", "myJmsPassword");
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageConsumer consumer = session.createConsumer(destination);
+            connection.start();
+            Message m = consumer.receive();
+            if(m instanceof Message){
+                TextMessage message = (TextMessage) m;
+                str = message.getText();
+            }
+            consumer.close();
+            session.close();
+            connection.close();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return Response.ok(str).build();
+    }
 }
