@@ -70,32 +70,66 @@ app.controller('mainController', function($scope, $http, $interval) {
     };
 
     $scope.updateTeamByPersonId = function () {
-
-            $http.get($scope.restURL + "updateteam/"
-                + $scope.idToUpdate2 + '/' + $scope.newTeamId).then(function(response){
-                $scope.dbReply = response.statusText;
-                $scope.updateTeamResult = response.data;
-            });
-        };
+        $http.get($scope.restURL + "updateteam/"
+            + $scope.idToUpdate2 + '/' + $scope.newTeamId).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.updateTeamResult = response.data;
+        });
+    };
 
 
     $scope.deleteById = function(){
-
         $http.get($scope.restURL + "delete/"
             + $scope.idToDelete).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.deleteResult = response.data;
         });
-    }
+    };
 
     $scope.deleteTeamById = function(){
+        $http.get($scope.restURL + "deleteteam/"
+            + $scope.teamIdToDelete).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.deleteTeamResult = response.data;
+        });
+    };
 
-            $http.get($scope.restURL + "deleteteam/"
-                + $scope.teamIdToDelete).then(function(response){
-                $scope.dbReply = response.statusText;
-                $scope.deleteTeamResult = response.data;
-            });
-        }
+    $scope.toMessageQueue = function(){
+        $http({
+            method: "POST",
+            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/queuemsg/",
+            data: { "messageForJMS": $scope.jmsMsg },
+            headers: {"Content-Type": "application/json"}
+            //headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        }).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.jmsMsgResult = response.data;
+        });
+    };
+
+    $scope.toMessageTopic = function(){
+        $http({
+            method: "POST",
+            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/topicmsg/",
+            data: { "messageForJMS": $scope.jmsMsg },
+            headers: {"Content-Type": "application/json"}
+        }).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.jmsMsgResult = response.data;
+        });
+    };
+
+    /*$scope.toMessageTopic = function(){
+        $http({
+            method: "POST",
+            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/topicmsg/",
+            data: { "messageForJMS": $scope.jmsMsg },
+            headers: {"Content-Type": "application/json"}
+        }).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.jmsMsgResult = response.data;
+        });
+    };*/
 
     $scope.halp = function(){
         alert("halp.");

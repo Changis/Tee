@@ -1,5 +1,6 @@
 package se.kits.javaee.controller;
 
+import se.kits.javaee.messaging.JmsMessageInput;
 import se.kits.javaee.model.Person;
 import se.kits.javaee.model.Team;
 
@@ -38,7 +39,10 @@ public class RestController {
     private ConnectionFactory connectionFactory;
 
     @Resource(lookup = "java:/myJmsTest/MyQueue")
-    private Destination destination;
+    private Queue queue;
+    @Resource(lookup = "java:/myJmsTest/DCTopic")
+    private Topic topic;
+    //private Destination destination;
 
     /* How to return a HTML.
     TO DO: Adress to HTML file in webapp folder */
@@ -183,15 +187,13 @@ public class RestController {
         return Response.ok(name + " was (hopefully) added to dcdb/person").build();
     }
 
-    @Path("/senddefaultmsg")
-    @GET
-    public void sendMsg(){
+    private Response sendMessage(String messagebody, boolean isPTP){
         try {
             Connection connection = connectionFactory.createConnection("myJmsUser", "myJmsPassword");
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            MessageProducer producer = session.createProducer(destination);
             TextMessage message = session.createTextMessage();
-            message.setText("This is the message");
+            message.setText(messagebody);
+            MessageProducer producer = isPTP ? session.createProducer(queue) : session.createProducer(topic);
             producer.send(message);
             producer.close();
             session.close();
@@ -201,17 +203,36 @@ public class RestController {
         }catch(Exception ex){
             ex.printStackTrace();
         }
+        return Response.ok().build();
     }
 
-    @Path("/getmsg")
+    @Path("/queuemsg")
+    @POST
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response queueMsg(JmsMessageInput jmsg){
+        return sendMessage(jmsg.getMessageForJMS(), true);
+    }
+
+    @Path("/topicmsg")
+    @POST
+//    @Consumes("application/x-www-form-urlencoded")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response topicMsg(JmsMessageInput jmsg){
+        return sendMessage(jmsg.getMessageForJMS(), false);
+    }
+
+    @Path("/getqueuemsg")
     @GET
+    @Consumes(APPLICATION_JSON)
     @Produces(TEXT_PLAIN)
-    public Response getMsg(){
+    public Response getQueueMsg(){
         String str = "failed msg consumption";
         try {
             Connection connection = connectionFactory.createConnection("myJmsUser", "myJmsPassword");
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            MessageConsumer consumer = session.createConsumer(destination);
+            MessageConsumer consumer = session.createConsumer(queue);
             connection.start();
             Message m = consumer.receive();
             if(m instanceof Message){
@@ -226,4 +247,31 @@ public class RestController {
         }
         return Response.ok(str).build();
     }
+
+    @Path("/gettopicmsg")
+    @GET
+    @Consumes(APPLICATION_JSON)
+    @Produces(TEXT_PLAIN)
+    public Response getTopicMsg(){
+        String str = "failed msg consumption";
+        try {
+            Connection connection = connectionFactory.createConnection("myJmsUser", "myJmsPassword");
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageConsumer consumer = session.createConsumer(topic);
+            connection.start();
+            Message m = consumer.receive();
+            if(m instanceof Message){
+                TextMessage message = (TextMessage) m;
+                str = message.getText();
+            }
+            consumer.close();
+            session.close();
+            connection.close();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return Response.ok(str).build();
+    }
+
+    // break out code! some day.
 }
