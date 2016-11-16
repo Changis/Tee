@@ -59,9 +59,7 @@ public class MsgBean implements MessageListener{
         if(message instanceof TextMessage){
             TextMessage tm = (TextMessage) message;
             try{
-                for(int i = 0; i < 5; i++){
-                    System.out.println("Message Received! : " + tm.getText());
-                }
+                System.out.println("Message Received! : " + tm.getText());
             }catch (Exception ex){
                 ex.printStackTrace();
             }finally {

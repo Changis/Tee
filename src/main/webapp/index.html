@@ -35,7 +35,7 @@
 <body ng-app="mainApp" ng-controller="mainController">
 <div class="container-fluid">
     <div class="row">
-        <p><h3>Time: {{theTime}} | SVAR: {{dbReply}}</h3></p>
+        <p><h3> {{theTime}} </h3></p>  <!-- | SVAR: {{dbReply}} -->
         <hr>
     </div>
     <div class="row">
@@ -77,6 +77,7 @@
                 <input type="submit" ng-click="deleteById()" value="DELETE">
             </form>
             Reply: {{deleteResult}}
+            <hr>
             <p></p>
             <form>
                 ADD TEAM<br>
@@ -107,14 +108,14 @@
             {{jmsMsgResult}}
         </div>
         <div class="col-sm-3">
-            <p><button ng-click="getAllNames()">getAllNames()</button></p>
+            <p><button type="button" class="btn btn-default" ng-click="getAllNames()">LIST NAMES</button></p>
             <!--<ul>
                 <li ng-repeat="x in dbReply">
                     {{x.personid + ': ' + x.personname}}
                 </li>
             </ul>-->
-            CLICK BUTTON OR HOVER OVER TABLES TO UPDATE
-            <table ng-mouseenter="getAllNames()" ng-mouseleave="getAllNames()" ng-click="getAllNames()">
+            <!--<table ng-mouseenter="getAllNames()" ng-mouseleave="getAllNames()" ng-click="getAllNames()">-->
+            <table>
                 <tr>
                     <th>personid</th>
                     <th>personname</th>
@@ -130,7 +131,9 @@
             </table>
         </div>
         <div class="col-sm-3">
-            <table ng-mouseenter="getAllTeams()" ng-mouseleave="getAllTeams()" ng-click="getAllTeams()">
+            <p><button type="button" class="btn btn-default" ng-click="getAllTeams()">LIST TEAMS</button></p>
+            <!--<table ng-mouseenter="getAllTeams()" ng-mouseleave="getAllTeams()" ng-click="getAllTeams()">-->
+            <table>
                 <tr>
                     <th>teamid</th>
                     <th>teamname</th>
