@@ -22,8 +22,8 @@ import javax.jms.*;
 })
 public class MsgBean implements MessageListener{
 
-    @Resource
-    private MessageDrivenContext mdc;
+//    @Resource
+//    private MessageDrivenContext mdc;
 
     @Resource(lookup = "java:/myJmsTest/MyConnectionFactory")
     private ConnectionFactory connectionFactory;
