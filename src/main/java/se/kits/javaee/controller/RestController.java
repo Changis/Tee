@@ -38,8 +38,12 @@ public class RestController {
     @Resource(lookup = "java:/myJmsTest/MyConnectionFactory")
     private ConnectionFactory connectionFactory;
 
+//    @Resource(lookup = "java:/myJmsTest/MyConnectionFactory")
+//    private TopicConnectionFactory tcf;
+
     @Resource(lookup = "java:/myJmsTest/MyQueue")
     private Queue queue;
+
     @Resource(lookup = "java:/myJmsTest/DCTopic")
     private Topic topic;
     //private Destination destination;
@@ -220,7 +224,24 @@ public class RestController {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response topicMsg(JmsMessageInput jmsg){
+        System.out.println("MSG TO TOPIC ARRIVED AT REST CONTROLLER: " + jmsg.getMessageForJMS());
         return sendMessage(jmsg.getMessageForJMS(), false);
+        /*try {
+            TopicConnection tconnection = tcf.createTopicConnection("myJmsUser", "myJmsPassword");
+            TopicSession tsession = tconnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+            TextMessage message = tsession.createTextMessage();
+            message.setText(jmsg.getMessageForJMS());
+            TopicPublisher tpublisher = tsession.createPublisher(topic);
+            tpublisher.publish(message);
+            tpublisher.close();
+            tsession.close();
+            tconnection.close();
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return Response.ok().build();*/
     }
 
     @Path("/getqueuemsg")
