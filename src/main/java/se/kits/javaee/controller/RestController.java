@@ -1,8 +1,10 @@
 package se.kits.javaee.controller;
 
-import se.kits.javaee.messaging.JmsMessageInput;
+import se.kits.javaee.rest.IdInput;
+import se.kits.javaee.rest.JmsMessageInput;
 import se.kits.javaee.model.Person;
-import se.kits.javaee.model.Team;
+import se.kits.javaee.rest.TaskInput;
+import se.kits.javaee.rest.UserTaskInput;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
@@ -15,10 +17,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.TEXT_HTML;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 /**
@@ -96,8 +96,8 @@ public class RestController {
     @Produces(APPLICATION_JSON)
     public Response showNameById(@PathParam("id") int id){
         try{
-            //return dbm.showPersonById(id);
-            return Response.ok(dbm.showPersonById(id)).build();
+            //return dbm.getPersonById(id);
+            return Response.ok(dbm.getPersonById(id)).build();
         }catch(Exception ex){
             //return ex.toString();
             return Response.serverError().build();
@@ -128,6 +128,18 @@ public class RestController {
         }
     }
 
+    @Path("/alltasks")
+    @GET
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response listAllTasks(){
+        try{
+            return Response.ok(dbm.listAllTasks()).build();
+        }catch(Exception ex){
+            return Response.ok(ex.toString()).build();
+        }
+    }
+
     @Path("/getmembers/{teamid}")
     @GET
     @Consumes(APPLICATION_JSON)
@@ -135,6 +147,19 @@ public class RestController {
     public Response listAllMembers(@PathParam("teamid") int teamid){
         try {
             return Response.ok(dbm.listAllMembers(teamid)).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
+    }
+
+    @Path("/taskmembers/{id}")
+    @GET
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response listMembersByTask(@PathParam("id") int id){
+        try {
+            return Response.ok(dbm.listMembersByTask(id)).build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.serverError().build();
@@ -177,11 +202,19 @@ public class RestController {
     @Consumes(APPLICATION_JSON)
     @Produces(TEXT_PLAIN)
     public Response deleteTeamById(@PathParam("id") int id){
-        int deletedRows = dbm.deleteTeamById(id);
-        return Response.ok(deletedRows + " rows deleted").build();
+        dbm.deleteTeamById(id);
+        return Response.ok().build();
     }
 
-    @Path("/post/add/{name}/{teamid}")
+    @Path("/task")
+    @DELETE
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response deleteTask(IdInput idInput){
+        return Response.ok(dbm.deleteTask(idInput.getId())).build();
+    }
+
+    /*@Path("/post/add/{name}/{teamid}")
     @POST
     @Consumes(APPLICATION_JSON)
     @Produces(TEXT_HTML)
@@ -189,6 +222,15 @@ public class RestController {
         Person p = dbm.registerPerson(name);
         //return Response.created(URI.create("/rest/" + p.getPersonid())).build();
         return Response.ok(name + " was (hopefully) added to dcdb/person").build();
+    }*/
+
+    @Path("/task")
+    @PUT
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response createTask(TaskInput taskInput){
+        //System.out.println("TASK@CONTROLLER: " + taskInput.getTaskDescription());
+        return Response.ok(dbm.createTask(taskInput.getTaskDescription())).build();
     }
 
     private Response sendMessage(String messagebody, boolean isPTP){
@@ -208,6 +250,19 @@ public class RestController {
             ex.printStackTrace();
         }
         return Response.ok().build();
+    }
+
+    @Path("/assigntask")
+    @POST
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response assignTask(UserTaskInput uti){
+        try {
+            return Response.ok(dbm.assignTaskToPerson(uti.getPersonId(), uti.getTaskId())).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Response.ok(false).build();
     }
 
     @Path("/queuemsg")

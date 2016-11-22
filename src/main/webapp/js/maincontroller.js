@@ -5,12 +5,15 @@ var app = angular.module('mainApp', []);
 app.controller('mainController', function($scope, $http, $interval) {
 
     $scope.dbReply = "";
-    $scope.pname = "glader";
+//    $scope.pname = "glader";
     $scope.restURL = "http://localhost:8080/Tee-1.0-SNAPSHOT/api/";
     // $scope.searchedId = 0;
     // $scope.idToUpdate = "";
     // $scope.newName = "";
     // $scope.idToDelete=-1;
+    $http.get($scope.restURL + "alltasks").then(function(response){
+        $scope.taskList = response.data;
+    });
 
     $scope.addPerson = function(){
         $http.get($scope.restURL + "add/"+$scope.pname).then(function(response){
@@ -40,7 +43,6 @@ app.controller('mainController', function($scope, $http, $interval) {
             // $http.get("/api/get/all").then(function(response){
             $scope.dbReply = response.statusText;
             $scope.personList = response.data;
-
         });
     };
 
@@ -49,14 +51,27 @@ app.controller('mainController', function($scope, $http, $interval) {
             // $http.get("/api/get/all").then(function(response){
             $scope.dbReply = response.statusText;
             $scope.teamList = response.data;
-
         });
     };
+
+    $scope.getAllTasks = function(){
+        $http.get($scope.restURL + "alltasks").then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.taskList = response.data
+        });
+    }
 
     $scope.getMembersList = function () {
         $http.get($scope.restURL + "getmembers/" + $scope.membersListById).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.getMembersListResult = response.data;
+        });
+    };
+
+    $scope.getMembersByTask = function () {
+        $http.get($scope.restURL + "taskmembers/" + $scope.membersListByTaskId).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.taskMembersResult = response.data;
         });
     };
 
@@ -119,17 +134,51 @@ app.controller('mainController', function($scope, $http, $interval) {
         });
     };
 
-    /*$scope.toMessageTopic = function(){
+    $scope.createTask = function(){
         $http({
-            method: "POST",
-            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/topicmsg/",
-            data: { "messageForJMS": $scope.jmsMsg },
+            method: "PUT",
+            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/task",
+            data: { "taskDescription": $scope.newTaskInput },
             headers: {"Content-Type": "application/json"}
         }).then(function(response){
             $scope.dbReply = response.statusText;
-            $scope.jmsMsgResult = response.data;
+            $scope.newTaskResult = response.data;
         });
-    };*/
+    };
+
+    $scope.assignTask = function(){
+        $http({
+            method: "POST",
+            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/assigntask",
+            data: {"personId": $scope.personId, "taskId": $scope.taskToAssign.taskId} ,
+            headers: {"Content-Type": "application/json"}
+        }).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.assignTaskResult = response.data;
+        });
+    };
+
+    $scope.deleteTask = function(){
+        $http({
+            method: "DELETE",
+            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/task",
+            data: {"id": $scope.taskIdToDelete},
+            headers: {"Content-Type": "application/json"}
+        }).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.deleteTaskResult = response.data;
+        });
+    };
+
+    $scope.orderPersonsTable = function(x){
+        $scope.reverse = ($scope.orderPersonsBy === x) ? !$scope.reverse : false;
+        $scope.orderPersonsBy = x;
+    }
+
+    $scope.orderTeamMembersTable = function(x){
+        $scope.reverseMembers = ($scope.orderTeamMembersBy === x) ? !$scope.reverseMembers : false;
+        $scope.orderTeamMembersBy = x;
+    }
 
     $scope.halp = function(){
         alert("halp.");

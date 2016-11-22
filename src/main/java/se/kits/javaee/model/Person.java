@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by David Chang on 2016-10-18.
@@ -44,9 +45,13 @@ public class Person implements Serializable{
     @JsonManagedReference
     private Team team;
 
-    /*@ManyToOne
-    @JoinColumn(name="teamid")
-    private int teamid;*/
+    @ManyToMany(targetEntity = se.kits.javaee.model.Task.class, fetch=FetchType.EAGER)
+    @JoinTable(
+            name="persons_tasks",
+            joinColumns=@JoinColumn(name="personID", referencedColumnName="personid"),
+            inverseJoinColumns=@JoinColumn(name="taskID", referencedColumnName="id"))
+    @JsonManagedReference
+    private List<Task> tasks;
 
     public Person(){}
 
@@ -75,14 +80,6 @@ public class Person implements Serializable{
         this.personname = personname;
     }
 
-    /*public int getTeamid() {
-        return teamid;
-    }
-
-    public void setTeamid(int teamid) {
-        this.teamid = teamid;
-    }*/
-
     public Team getTeam() {
         return team;
     }
@@ -91,11 +88,11 @@ public class Person implements Serializable{
         this.team = team;
     }
 
-/*    public int getTeamid() {
-        return teamid;
+    public List<Task> getTasks() {
+        return tasks;
     }
 
-    public void setTeamid(int teamid) {
-        this.teamid = teamid;
-    }*/
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
 }
