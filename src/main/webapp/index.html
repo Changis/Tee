@@ -170,6 +170,16 @@
                 </tr>
             </table><br>
             <p><button type="button" class="btn btn-default" ng-click="getAllTasks()">LIST TASKS</button></p>
+            <table>
+                <tr>
+                    <th>taskid</th>
+                    <th>task</th>
+                </tr>
+                <tr ng-repeat = "task in taskList | orderBy:'taskId'">
+                    <td>{{ task.taskId }}</td>
+                    <td>{{ task.description }}</td>
+                </tr>
+            </table><br>
             <hr>
             <p><button ng-click="halp()">halp</button></p>
         </div>
