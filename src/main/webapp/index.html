@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <title>HELLO</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
     <script src="js/maincontroller.js"></script>
 
     <style>
@@ -23,123 +33,197 @@
     </style>
 </head>
 <body ng-app="mainApp" ng-controller="mainController">
-<p><h3>Time: {{theTime}} | SVAR: {{dbReply}}</h3></p>
-<hr>
-<form>
-    ADD NAME<br>
-    NAME: <input type="text" name="insertthis" ng-model="pname">
-    <!--<input type="text" name="insertthisteam" ng-model="pnameteam">-->
-    <br><input type="submit" ng-click="addPerson()" value="ADD">
-</form>
-Reply: added personid: {{addResult.personid}}
-<p></p>
-<form>
-    FIND BY ID<br>
-    ID: <input type="text" name="inSearchId" ng-model="searchedId"><br>
-    <input type="submit" ng-click="getNameById()" value="GET"><br>
-</form>
-Found: {{searchResult}}
-<p></p>
-<form>
-    UPDATE BY ID: <br>
-    ID: <input type="text" name="inUpdateId" ng-model="idToUpdate"><br>
-    NAME: <input type="text" name="inUpdateName" ng-model="newName"><br>
-    <input type="submit" ng-click="updateNameById()" value="UPDATE"><br>
-</form>
-Reply: {{updateResult}}
-<p></p>
-<form>
-    UPDATE TEAM BY PERSONID: <br>
-    ID: <input type="text" name="inUpdateId2" ng-model="idToUpdate2"><br>
-    TEAM ID: <input type="text" name="inUpdateTeamId" ng-model="newTeamId"><br>
-    <input type="submit" ng-click="updateTeamByPersonId()" value="UPDATE TEAM"><br>
-</form>
-Reply: {{updateTeamResult}}
-<p></p>
-<form>
-    DELETE BY ID<br>
-    ID: <input type="text" name="inDeleteId" ng-model="idToDelete"><br>
-    <input type="submit" ng-click="deleteById()" value="DELETE">
-</form>
-Reply: {{deleteResult}}
-<p></p>
-<form>
-    ADD TEAM<br>
-    TEAMNAME: <input type="text" name="insertteam" ng-model="tname"><br>
-    SHORT TEAMNAME: <input type="text" name="insertteamshort" ng-model="shorttname"><br>
-    <!--<input type="text" name="insertthisteam" ng-model="pnameteam">-->
-    <input type="submit" ng-click="addTeam()" value="ADD TEAM"><br>
-</form>
-Reply: added team with id: {{addTeamResult.id}}
-<p></p>
-<form>
-    DELETE TEAM BY ID<br>
-    TEAM ID: <input type="text" name="inDeleteTeamId" ng-model="teamIdToDelete"><br>
-    <input type="submit" ng-click="deleteTeamById()" value="DELETE TEAM">
-</form>
-Reply: {{deleteTeamResult}}
+<div class="container-fluid">
+    <div class="row">
+        <p><h3> {{theTime}} </h3></p>  <!-- | SVAR: {{dbReply}} -->
+        <hr>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <form>
+                ADD NAME<br>
+                NAME: <input type="text" name="insertthis" ng-model="pname">
+                <!--<input type="text" name="insertthisteam" ng-model="pnameteam">-->
+                <br><input type="submit" class="btn btn-default" ng-click="addPerson()" value="ADD">
+            </form>
+            added personid: {{addResult.personid}}
+            <p></p>
+            <form>
+                FIND BY ID<br>
+                ID: <input type="text" name="inSearchId" ng-model="searchedId"><br>
+                <input type="submit" ng-click="getNameById()" value="GET"><br>
+            </form>
+            re: {{searchResult}}
+            <p></p>
+            <form>
+                UPDATE BY ID: <br>
+                ID: <input type="text" name="inUpdateId" ng-model="idToUpdate"><br>
+                NAME: <input type="text" name="inUpdateName" ng-model="newName"><br>
+                <input type="submit" ng-click="updateNameById()" value="UPDATE"><br>
+            </form>
+            Reply: {{updateResult}}
+            <p></p>
+            <form>
+                UPDATE TEAM BY PERSONID: <br>
+                ID: <input type="text" name="inUpdateId2" ng-model="idToUpdate2"><br>
+                TEAM ID: <input type="text" name="inUpdateTeamId" ng-model="newTeamId"><br>
+                <input type="submit" ng-click="updateTeamByPersonId()" value="UPDATE TEAM"><br>
+            </form>
+            Reply: {{updateTeamResult}}
+            <p></p>
+            <form>
+                ASSIGN TASK <br>
+                PERSONID: <input type="text" name="assignTask1" ng-model="personId"><br>
+                <!--TASKID: <input type="text" name="assignTask2" ng-model="taskId"><br>-->
+                TASK: <select ng-model="taskToAssign" ng-options="x.description for x in taskList"></select><br>
+                <button type="button" class="btn btn-default" ng-click="assignTask()">ASSIGN TASK</button>
+            </form>
+            Reply: {{assignTaskResult}}
+            <p></p>
+            <form>
+                DELETE BY ID<br>
+                ID: <input type="text" name="inDeleteId" ng-model="idToDelete"><br>
+                <input type="submit" ng-click="deleteById()" value="DELETE">
+            </form>
+            Reply: {{deleteResult}}
+            <hr>
+            <p></p>
+            <form>
+                ADD TEAM<br>
+                TEAMNAME: <input type="text" name="insertteam" ng-model="tname"><br>
+                SHORT TEAMNAME: <input type="text" name="insertteamshort" ng-model="shorttname"><br>
+                <!--<input type="text" name="insertthisteam" ng-model="pnameteam">-->
+                <input type="submit" ng-click="addTeam()" value="ADD TEAM"><br>
+            </form>
+            added team with id: {{addTeamResult.id}}
+            <p></p>
+            <form>
+                DELETE TEAM BY ID<br>
+                TEAM ID: <input type="text" name="inDeleteTeamId" ng-model="teamIdToDelete"><br>
+                <input type="submit" ng-click="deleteTeamById()" value="DELETE TEAM">
+            </form>
+            Reply: {{deleteTeamResult}}
+            <hr>
+            <p></p>
+            <form>
+                ADD TASK<br>
+                TASK: <input type="text" name="insertTask" ng-model="newTaskInput"><br>
+                <input type="submit" ng-click="createTask()" value="NEW TASK"><br>
+            </form>
+            added task with id: {{newTaskResult.taskId}}
+            <p></p>
+            <form>
+                DELETE TASK<br>
+                TASK ID: <input type="text" name="deleteTask" ng-model="taskIdToDelete"><br>
+                <button type="button" class="btn btn-default" ng-click="deleteTask()">DELETE TASK</button>
+            </form>
+            Reply: {{deleteTaskResult}}
+            <hr>
+            <form>
+                <div class="form-group">
+                    <label for="jmsMsgInput">JMSMessage: </label>
+                    <textarea class="form-control" id="jmsMsgInput" rows="5" cols="20" ng-model="jmsMsg">
 
-<p></p>
-<form>
-    LIST MEMBERS BY TEAM ID<br>
-    TEAM ID: <input type="text" name="membersListSearch" ng-model="membersListById"><br>
-    <input type="submit" ng-click="getMembersList()" value="LIST MEMBERS">
-</form>
-<table>
-    <tr>
-        <th>personid</th>
-        <th>personname</th>
-        <th>teamid</th>
-        <th>teamname</th>
-    </tr>
-    <tr ng-repeat = "teammember in getMembersListResult">
-        <td>{{ teammember.personid }}</td>
-        <td>{{ teammember.personname }}</td>
-        <td>{{ teammember.team.id }}</td>
-        <td>{{ teammember.team.teamName }}</td>
-    </tr>
-</table>
-<hr>
+                    </textarea><br>
+                </div>
+                <button type="button" class="btn btn-default" ng-click="toMessageQueue()">toQueue</button>
+                <button type="button" class="btn btn-default" ng-click="toMessageTopic()">toTopic</button>
+            </form>
+            {{jmsMsgResult}}
+        </div>
+        <div class="col-sm-3">
+            <p><button type="button" class="btn btn-default" ng-click="getAllNames()">LIST NAMES</button></p>
+            <!--<ul>
+                <li ng-repeat="x in dbReply">
+                    {{x.personid + ': ' + x.personname}}
+                </li>
+            </ul>-->
+            <!--<table ng-mouseenter="getAllNames()" ng-mouseleave="getAllNames()" ng-click="getAllNames()">-->
+            <table>
+                <tr>
+                    <th ng-click="orderPersonsTable('personid')">personid</th>
+                    <th ng-click="orderPersonsTable('personname')">personname</th>
+                    <th ng-click="orderPersonsTable('team.id')">teamid</th>
+                    <th ng-click="orderPersonsTable('team.teamName')">teamname</th>
+                </tr>
+                <tr ng-repeat = "p in personList | orderBy: orderPersonsBy:reverse">
+                    <td>{{ p.personid }}</td>
+                    <td>{{ p.personname }}</td>
+                    <td>{{ p.team.id }}</td>
+                    <td>{{ p.team.teamName }}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-3">
+            <p><button type="button" class="btn btn-default" ng-click="getAllTeams()">LIST TEAMS</button></p>
+            <!--<table ng-mouseenter="getAllTeams()" ng-mouseleave="getAllTeams()" ng-click="getAllTeams()">-->
+            <table>
+                <tr>
+                    <th>teamid</th>
+                    <th>teamname</th>
+                    <th>shortteamname</th>
+                </tr>
+                <tr ng-repeat = "t in teamList | orderBy:'id'">
+                    <td>{{ t.id }}</td>
+                    <td>{{ t.teamName }}</td>
+                    <td>{{ t.shortName }}</td>
+                </tr>
+            </table><br>
+            <p><button type="button" class="btn btn-default" ng-click="getAllTasks()">LIST TASKS</button></p>
+            <table>
+                <tr>
+                    <th>taskid</th>
+                    <th>task</th>
+                </tr>
+                <tr ng-repeat = "task in taskList | orderBy:'taskId'">
+                    <td>{{ task.taskId }}</td>
+                    <td>{{ task.description }}</td>
+                </tr>
+            </table><br>
+            <hr>
+            <p><button ng-click="halp()">halp</button></p>
+        </div>
+        <div class="col-sm-3">
+            <p></p>
+            <form>
+                LIST MEMBERS BY TEAM ID<br>
+                TEAM ID: <input type="text" name="membersListSearch" ng-model="membersListById"><br>
+                <input type="submit" ng-click="getMembersList()" value="LIST MEMBERS">
+            </form>
+            <table>
+                <tr>
+                    <th ng-click="orderTeamMembersTable('personid')">personid</th>
+                    <th ng-click="orderTeamMembersTable('personname')">personname</th>
+                    <th>teamid</th>
+                    <th>teamname</th>
+                </tr>
+                <tr ng-repeat = "teammember in getMembersListResult | orderBy:orderTeamMembersBy:reverseMembers">
+                    <td>{{ teammember.personid }}</td>
+                    <td>{{ teammember.personname }}</td>
+                    <td>{{ teammember.team.id }}</td>
+                    <td>{{ teammember.team.teamName }}</td>
+                </tr>
+            </table>
+            <p></p>
+            <form>
+                LIST MEMBERS BY TASK<br>
+                TASK ID: <input type="text" name="listMembersByTask" ng-model="membersListByTaskId"><br>
+                <input type="submit" ng-click="getMembersByTask()" value="TASK MEMBERS">
+            </form>
+            <table>
+                <tr>
+                    <th>personid</th>
+                    <th>personname</th>
+                </tr>
+                <tr ng-repeat = "teammember in taskMembersResult | orderBy: 'personid'">
+                    <td>{{ teammember.personid }}</td>
+                    <td>{{ teammember.personname }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
 
-<p><button ng-click="getAllNames()">getAllNames()</button></p>
-
-<!--<ul>
-    <li ng-repeat="x in dbReply">
-        {{x.personid + ': ' + x.personname}}
-    </li>
-</ul>-->
-CLICK BUTTON OR HOVER OVER TABLES TO UPDATE
-<table ng-mouseenter="getAllNames()" ng-mouseleave="getAllNames()" ng-click="getAllNames()">
-    <tr>
-        <th>personid</th>
-        <th>personname</th>
-        <th>teamid</th>
-        <th>teamname</th>
-    </tr>
-    <tr ng-repeat = "p in personList">
-        <td>{{ p.personid }}</td>
-        <td>{{ p.personname }}</td>
-        <td>{{ p.team.id }}</td>
-        <td>{{ p.team.teamName }}</td>
-    </tr>
-</table>
-
-<table ng-mouseenter="getAllTeams()" ng-mouseleave="getAllTeams()" ng-click="getAllTeams()">
-    <tr>
-        <th>teamid</th>
-        <th>teamname</th>
-        <th>shortteamname</th>
-    </tr>
-    <tr ng-repeat = "t in teamList">
-        <td>{{ t.id }}</td>
-        <td>{{ t.teamName }}</td>
-        <td>{{ t.shortName }}</td>
-    </tr>
-</table>
-
-<hr>
-
-<p><button ng-click="halp()">halp</button></p>
 <!--<script>
     function halp() {
         alert("I am an alert box!");

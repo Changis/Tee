@@ -3,9 +3,9 @@ package se.kits.javaee.controller;
 
 
 import se.kits.javaee.model.Person;
+import se.kits.javaee.model.Task;
 import se.kits.javaee.model.Team;
 
-import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import javax.persistence.*;
 import java.util.Iterator;
@@ -35,7 +35,7 @@ public class PsqlManager {
         return em.merge(p);
     }
 
-    public Person showPersonById(int id) throws Exception{
+    public Person getPersonById(int id) throws Exception{
         return (Person) em.createQuery("select p from Person p where p.personid = :id")
                 .setParameter("id", id).getSingleResult();
     }
@@ -53,9 +53,31 @@ public class PsqlManager {
         return em.createQuery("select t from Team t").getResultList();
     }
 
-    public List listAllMembers(int teamid) throws Exception{
-        Team t = em.find(Team.class, teamid);
-        return t.getMembersList();
+    public List listAllTasks(){
+        return em.createQuery("select t from Task t").getResultList();
+    }
+
+    public List<Person> listAllMembers(int teamid) throws Exception{
+//        Team t = em.find(Team.class, teamid);
+        Team t = (Team) em.createQuery("select t from Team t where t.id = :teamid")
+                .setParameter("teamid", teamid).getSingleResult();
+        //return (t != null) ? t.getMembersList() : null;
+        if(t != null){
+            List<Person> list = t.getMembersList();
+            System.out.println("Size: " + list.size());
+            for(Person p : list){
+                System.out.println(p.getPersonname());
+            }
+            return list;
+        }
+        return null;
+    }
+
+    public List listMembersByTask(int id){
+//        Task t = em.find(Task.class, id);
+        Task t = (Task) em.createQuery("select t from Task t where t.id = :id")
+                .setParameter("id", id).getSingleResult();
+        return (t != null) ? t.getPersons() : null;
     }
 
     public int updateNameById(int id, String name){
@@ -64,7 +86,7 @@ public class PsqlManager {
     }
 
     public Person updateTeamByPersonId(int personid, int teamid) throws Exception{
-        Person p = showPersonById(personid);
+        Person p = getPersonById(personid);
         p.setTeam(getTeamById(teamid));
 
         return em.merge(p);
@@ -78,8 +100,35 @@ public class PsqlManager {
         return em.createQuery("delete from Person p where p.personid = :id").setParameter("id", id).executeUpdate();
     }
 
-    public int deleteTeamById(int id){
-        return em.createQuery("delete from Team t where t.id = :id").setParameter("id", id).executeUpdate();
+    public void deleteTeamById(int id){
+//        Team team = em.find(Team.class, id);
+        Team team = (Team) em.createQuery("select t from Team t where t.id = :id")
+                .setParameter("id", id).getSingleResult();
+        List<Person> membersList = team.getMembersList();
+        for(Person p : membersList){
+            p.setTeam(null);
+            em.persist(p);
+        }
+        //return em.createQuery("delete from Team t where t.id = :id").setParameter("id", id).executeUpdate();
+        em.remove(team);
+        // database constraint: ON DELETE SET NULL (how to fix?, impossible in jpa?), ON DELETE CASCADE
+    }
+
+    public boolean deleteTask(int id){
+        Task t = getTask(id);
+        List<Person> taskMembers = t.getPersons();
+        for(Person p : taskMembers){
+            List<Task> taskList = p.getTasks();
+            /*for(Iterator<Task> it = taskList.iterator(); it.hasNext(); ){
+                if(it.next().getTaskId() == id){
+                    it.remove();
+                }
+            }*/
+            taskList.removeIf(t2 -> t2.getTaskId()== id);
+            em.persist(p);
+        }
+        em.remove(t);
+        return true;
     }
 
     public Team registerTeam(String name, String shortname){
@@ -89,6 +138,33 @@ public class PsqlManager {
             t.setShortName(shortname);
         }
         return em.merge(t);
+    }
+
+    public Task createTask(String description){
+        Task task = new Task();
+        task.setDescription(description);
+        return em.merge(task);
+    }
+
+    public Task getTask(int id){
+        return (Task) em.createQuery("select t from Task t where t.id = :id")
+                .setParameter("id", id).getSingleResult();
+    }
+
+    public boolean assignTaskToPerson(int personid, int taskid) throws Exception{
+//        Person person = em.find(Person.class, personid);
+//        Task task = em.find(Task.class, taskid);
+        Person person = getPersonById(personid);
+        Task task = getTask(taskid);
+        if(person != null && task != null){
+//            person.getTasks().add(task);
+            List<Task> taskList = person.getTasks();
+            taskList.add(task);
+            person.setTasks(taskList);
+            em.persist(person);
+            return true;
+        }
+        return false;
     }
 
 }

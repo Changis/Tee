@@ -28,7 +28,7 @@ public class Team implements Serializable{
     @Column(name="shortname")
     private String shortName;
 
-//    @OneToMany(mappedBy="team", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+//    @OneToMany(mappedBy="team", cascade=CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)
     @OneToMany(mappedBy="team", fetch=FetchType.EAGER)
     //@JsonManagedReference
     @JsonBackReference

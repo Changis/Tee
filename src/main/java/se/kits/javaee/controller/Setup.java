@@ -9,7 +9,7 @@ import javax.inject.Inject;
  * Created by David Chang on 2016-10-14.
  */
 //@Startup
-@Stateless
+//@Stateless
 //@Singleton
 //@Path("/test")
 public class Setup {
@@ -30,7 +30,7 @@ public class Setup {
         entitymanager.close();
         emf.close();*/
 
-        Person p = dbm.registerPerson("darne");
+//        Person p = dbm.registerPerson("darne");
     }
 }
 

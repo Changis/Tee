@@ -1,10 +1,15 @@
 package se.kits.javaee.controller;
 
+import se.kits.javaee.rest.IdInput;
+import se.kits.javaee.rest.JmsMessageInput;
 import se.kits.javaee.model.Person;
-import se.kits.javaee.model.Team;
+import se.kits.javaee.rest.TaskInput;
+import se.kits.javaee.rest.UserTaskInput;
 
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.*;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,10 +17,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.TEXT_HTML;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 /**
@@ -31,6 +34,19 @@ public class RestController {
 
     @Inject
     private MysqlManager dbm2;
+
+    @Resource(lookup = "java:/myJmsTest/MyConnectionFactory")
+    private ConnectionFactory connectionFactory;
+
+//    @Resource(lookup = "java:/myJmsTest/MyConnectionFactory")
+//    private TopicConnectionFactory tcf;
+
+    @Resource(lookup = "java:/myJmsTest/MyQueue")
+    private Queue queue;
+
+    @Resource(lookup = "java:/myJmsTest/DCTopic")
+    private Topic topic;
+    //private Destination destination;
 
     /* How to return a HTML.
     TO DO: Adress to HTML file in webapp folder */
@@ -80,8 +96,8 @@ public class RestController {
     @Produces(APPLICATION_JSON)
     public Response showNameById(@PathParam("id") int id){
         try{
-            //return dbm.showPersonById(id);
-            return Response.ok(dbm.showPersonById(id)).build();
+            //return dbm.getPersonById(id);
+            return Response.ok(dbm.getPersonById(id)).build();
         }catch(Exception ex){
             //return ex.toString();
             return Response.serverError().build();
@@ -112,6 +128,18 @@ public class RestController {
         }
     }
 
+    @Path("/alltasks")
+    @GET
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response listAllTasks(){
+        try{
+            return Response.ok(dbm.listAllTasks()).build();
+        }catch(Exception ex){
+            return Response.ok(ex.toString()).build();
+        }
+    }
+
     @Path("/getmembers/{teamid}")
     @GET
     @Consumes(APPLICATION_JSON)
@@ -119,6 +147,19 @@ public class RestController {
     public Response listAllMembers(@PathParam("teamid") int teamid){
         try {
             return Response.ok(dbm.listAllMembers(teamid)).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
+    }
+
+    @Path("/taskmembers/{id}")
+    @GET
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response listMembersByTask(@PathParam("id") int id){
+        try {
+            return Response.ok(dbm.listMembersByTask(id)).build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.serverError().build();
@@ -161,11 +202,19 @@ public class RestController {
     @Consumes(APPLICATION_JSON)
     @Produces(TEXT_PLAIN)
     public Response deleteTeamById(@PathParam("id") int id){
-        int deletedRows = dbm.deleteTeamById(id);
-        return Response.ok(deletedRows + " rows deleted").build();
+        dbm.deleteTeamById(id);
+        return Response.ok().build();
     }
 
-    @Path("/post/add/{name}/{teamid}")
+    @Path("/task")
+    @DELETE
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response deleteTask(IdInput idInput){
+        return Response.ok(dbm.deleteTask(idInput.getId())).build();
+    }
+
+    /*@Path("/post/add/{name}/{teamid}")
     @POST
     @Consumes(APPLICATION_JSON)
     @Produces(TEXT_HTML)
@@ -173,6 +222,132 @@ public class RestController {
         Person p = dbm.registerPerson(name);
         //return Response.created(URI.create("/rest/" + p.getPersonid())).build();
         return Response.ok(name + " was (hopefully) added to dcdb/person").build();
+    }*/
+
+    @Path("/task")
+    @PUT
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response createTask(TaskInput taskInput){
+        //System.out.println("TASK@CONTROLLER: " + taskInput.getTaskDescription());
+        return Response.ok(dbm.createTask(taskInput.getTaskDescription())).build();
     }
 
+    private Response sendMessage(String messagebody, boolean isPTP){
+        try {
+            Connection connection = connectionFactory.createConnection("myJmsUser", "myJmsPassword");
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            TextMessage message = session.createTextMessage();
+            message.setText(messagebody);
+            MessageProducer producer = isPTP ? session.createProducer(queue) : session.createProducer(topic);
+            producer.send(message);
+            producer.close();
+            session.close();
+            connection.close();
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return Response.ok().build();
+    }
+
+    @Path("/assigntask")
+    @POST
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response assignTask(UserTaskInput uti){
+        try {
+            return Response.ok(dbm.assignTaskToPerson(uti.getPersonId(), uti.getTaskId())).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Response.ok(false).build();
+    }
+
+    @Path("/queuemsg")
+    @POST
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response queueMsg(JmsMessageInput jmsg){
+        return sendMessage(jmsg.getMessageForJMS(), true);
+    }
+
+    @Path("/topicmsg")
+    @POST
+//    @Consumes("application/x-www-form-urlencoded")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response topicMsg(JmsMessageInput jmsg){
+        System.out.println("MSG TO TOPIC ARRIVED AT REST CONTROLLER: " + jmsg.getMessageForJMS());
+        return sendMessage(jmsg.getMessageForJMS(), false);
+        /*try {
+            TopicConnection tconnection = tcf.createTopicConnection("myJmsUser", "myJmsPassword");
+            TopicSession tsession = tconnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+            TextMessage message = tsession.createTextMessage();
+            message.setText(jmsg.getMessageForJMS());
+            TopicPublisher tpublisher = tsession.createPublisher(topic);
+            tpublisher.publish(message);
+            tpublisher.close();
+            tsession.close();
+            tconnection.close();
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return Response.ok().build();*/
+    }
+
+    @Path("/getqueuemsg")
+    @GET
+    @Consumes(APPLICATION_JSON)
+    @Produces(TEXT_PLAIN)
+    public Response getQueueMsg(){
+        String str = "failed msg consumption";
+        try {
+            Connection connection = connectionFactory.createConnection("myJmsUser", "myJmsPassword");
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageConsumer consumer = session.createConsumer(queue);
+            connection.start();
+            Message m = consumer.receive();
+            if(m instanceof Message){
+                TextMessage message = (TextMessage) m;
+                str = message.getText();
+            }
+            consumer.close();
+            session.close();
+            connection.close();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return Response.ok(str).build();
+    }
+
+    @Path("/gettopicmsg")
+    @GET
+    @Consumes(APPLICATION_JSON)
+    @Produces(TEXT_PLAIN)
+    public Response getTopicMsg(){
+        String str = "failed msg consumption";
+        try {
+            Connection connection = connectionFactory.createConnection("myJmsUser", "myJmsPassword");
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageConsumer consumer = session.createConsumer(topic);
+            connection.start();
+            Message m = consumer.receive();
+            if(m instanceof Message){
+                TextMessage message = (TextMessage) m;
+                str = message.getText();
+            }
+            consumer.close();
+            session.close();
+            connection.close();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return Response.ok(str).build();
+    }
+
+    // break out code! some day.
 }
