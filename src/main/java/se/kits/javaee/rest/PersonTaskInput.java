@@ -10,14 +10,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "usertaskinput")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class UserTaskInput {
+public class PersonTaskInput {
     @XmlElement(required=true)
     private int personId;
 
     @XmlElement(required=true)
     private int taskId;
 
-    public UserTaskInput(){}
+    public PersonTaskInput(){}
 
     public int getPersonId() {
         return personId;

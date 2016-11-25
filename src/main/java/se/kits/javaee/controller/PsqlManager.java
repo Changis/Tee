@@ -8,6 +8,7 @@ import se.kits.javaee.model.Team;
 
 import javax.ejb.Stateless;
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -35,14 +36,25 @@ public class PsqlManager {
         return em.merge(p);
     }
 
-    public Person getPersonById(int id) throws Exception{
-        return (Person) em.createQuery("select p from Person p where p.personid = :id")
-                .setParameter("id", id).getSingleResult();
+    public Person getPersonById(int id){
+        try{
+            return (Person) em.createQuery("select p from Person p where p.personid = :id")
+                    .setParameter("id", id).getSingleResult();
+        }catch(Exception e){
+            System.err.println(e.toString());
+            return null;
+        }
+
     }
 
-    public Team getTeamById(int teamid) throws Exception{
-        return (Team) em.createQuery("select t from Team t where t.id = :teamid")
-                .setParameter("teamid", teamid).getSingleResult();
+    public Team getTeamById(int teamid){
+        try{
+            return (Team) em.createQuery("select t from Team t where t.id = :teamid")
+                    .setParameter("teamid", teamid).getSingleResult();
+        }catch(Exception ex){
+            System.err.println(ex.toString());
+        }
+        return null;
     }
 
     public List listAll(){
@@ -57,27 +69,35 @@ public class PsqlManager {
         return em.createQuery("select t from Task t").getResultList();
     }
 
-    public List<Person> listAllMembers(int teamid) throws Exception{
+    public List<Person> listAllMembers(int teamid){
 //        Team t = em.find(Team.class, teamid);
-        Team t = (Team) em.createQuery("select t from Team t where t.id = :teamid")
-                .setParameter("teamid", teamid).getSingleResult();
+        try{
+            return ((Team)em.createQuery("select t from Team t where t.id = :teamid")
+                    .setParameter("teamid", teamid).getSingleResult()).getMembersList();
+        }catch(Exception ex){
+            System.err.println(ex.toString());
+            return (new ArrayList<Person>());
+        }
         //return (t != null) ? t.getMembersList() : null;
-        if(t != null){
+        /*if(t != null){
             List<Person> list = t.getMembersList();
             System.out.println("Size: " + list.size());
             for(Person p : list){
                 System.out.println(p.getPersonname());
             }
             return list;
-        }
-        return null;
+        }*/
     }
 
     public List listMembersByTask(int id){
 //        Task t = em.find(Task.class, id);
-        Task t = (Task) em.createQuery("select t from Task t where t.id = :id")
-                .setParameter("id", id).getSingleResult();
-        return (t != null) ? t.getPersons() : null;
+        try{
+            return ((Task)em.createQuery("select t from Task t where t.id = :id")
+                    .setParameter("id", id).getSingleResult()).getPersons();
+        }catch(Exception ex){
+            System.err.println(ex.toString());
+            return (new ArrayList<Person>());
+        }
     }
 
     public int updateNameById(int id, String name){
@@ -85,19 +105,34 @@ public class PsqlManager {
                 .setParameter("id", id).setParameter("name", name).executeUpdate();
     }
 
-    public Person updateTeamByPersonId(int personid, int teamid) throws Exception{
+    public Person updateTeamByPersonId(int personid, int teamid){
         Person p = getPersonById(personid);
-        p.setTeam(getTeamById(teamid));
-
-        return em.merge(p);
+        Team t = getTeamById(teamid);
+        if(p != null && t != null){
+            p.setTeam(t);
+            return em.merge(p);
+        }
+        return null;
         /*return em.createQuery("update Person p set p.teamid = :teamid where p.personid = :personid")
                 .setParameter("personid", personid).setParameter("teamid", teamid).executeUpdate();*/
     }
 
-    public int deletePersonById(int id){
+    public boolean deletePersonById(int id){
 //        return em.createQuery("select a from User a where a.id = :id", User.class)
 //                .setParameter("id", id).getSingleResult();
-        return em.createQuery("delete from Person p where p.personid = :id").setParameter("id", id).executeUpdate();
+//        return em.createQuery("delete from Person p where p.personid = :id").setParameter("id", id).executeUpdate();
+        Person p = getPersonById(id);
+        if(p != null){
+            List<Task> taskList = p.getTasks();
+            for(Task t : taskList){
+                List<Person> taskMembers = t.getPersons();
+                taskMembers.removeIf(p2 -> p2.getPersonid() == id);
+                em.persist(t);
+            }
+            em.remove(p);
+            return true;
+        }
+        return false;
     }
 
     public void deleteTeamById(int id){
@@ -129,6 +164,18 @@ public class PsqlManager {
         }
         em.remove(t);
         return true;
+    }
+
+    public boolean unassignTask(int personId, int taskId){
+        Person person = getPersonById(personId);
+        Task task = getTask(taskId);
+        if(person != null && task != null){
+            List<Task> taskList = person.getTasks();
+            taskList.removeIf(t2 -> t2.getTaskId() == taskId);
+            em.persist(person);
+            return true;
+        }
+        return false;
     }
 
     public Team registerTeam(String name, String shortname){
@@ -166,5 +213,4 @@ public class PsqlManager {
         }
         return false;
     }
-
 }
