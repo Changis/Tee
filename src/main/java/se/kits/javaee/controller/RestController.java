@@ -1,10 +1,7 @@
 package se.kits.javaee.controller;
 
-import se.kits.javaee.rest.IdInput;
-import se.kits.javaee.rest.JmsMessageInput;
+import se.kits.javaee.rest.*;
 import se.kits.javaee.model.Person;
-import se.kits.javaee.rest.TaskInput;
-import se.kits.javaee.rest.UserTaskInput;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
@@ -69,32 +66,33 @@ public class RestController {
     }
 
     //CREATE READ UPDATE DELETE
+    // https://www.tutorialspoint.com/restful/restful_quick_guide.htm
 
-    @Path("/add/{name}")
-    @GET
+    @Path("/persons")
+    @PUT
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     //@Produces(TEXT_HTML)
-    public Response registerPerson(@PathParam("name") String name){
-        return Response.ok(dbm.registerPerson(name)).build();
+    public Response registerPerson(NewPersonInput newPersonInput){
+        return Response.ok(dbm.registerPerson(newPersonInput.getName())).build();
 //        return Response.ok(name + " was (hopefully) added to dcdb/person").build();
         //return Response.created(URI.create("/rest/" + p.getPersonid())).build();
     }
 
-    @Path("/addteam/{name}/{shortname}")
-    @GET
+    @Path("/teams")
+    @PUT
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response registerTeam(@PathParam("name") String name, @PathParam("shortname") String shortname){
+    public Response registerTeam(NewTeamInput newTeamInput){
         //return Response.created(URI.create("/rest/" + p.getPersonid())).build();
-        return Response.ok(dbm.registerTeam(name, shortname)).build();
+        return Response.ok(dbm.registerTeam(newTeamInput.getName(), newTeamInput.getShortName())).build();
     }
 
-    @Path("/get/{id}")
+    @Path("/persons/{id}")
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response showNameById(@PathParam("id") int id){
+    public Response getPerson(@PathParam("id") int id){
         try{
             //return dbm.getPersonById(id);
             return Response.ok(dbm.getPersonById(id)).build();
@@ -104,7 +102,7 @@ public class RestController {
         }
     }
 
-    @Path("/get/all")
+    @Path("/persons")
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -116,7 +114,7 @@ public class RestController {
         }
     }
 
-    @Path("/get/allteams")
+    @Path("/teams")
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -128,7 +126,7 @@ public class RestController {
         }
     }
 
-    @Path("/alltasks")
+    @Path("/tasks")
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -140,7 +138,7 @@ public class RestController {
         }
     }
 
-    @Path("/getmembers/{teamid}")
+    @Path("/teammembers/{teamid}")
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -148,7 +146,8 @@ public class RestController {
         try {
             return Response.ok(dbm.listAllMembers(teamid)).build();
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            System.err.println(e.toString());
             return Response.serverError().build();
         }
     }
@@ -166,22 +165,22 @@ public class RestController {
         }
     }
 
-    @Path("/update/{id}/{name}")
-    @GET
+    @Path("/personnameupdate")
+    @POST
     @Consumes(APPLICATION_JSON)
-    @Produces(TEXT_PLAIN)
-    public Response updateNameById(@PathParam("id") int id, @PathParam("name") String name){
-        return Response.ok(dbm.updateNameById(id, name) + " rows updated").build();
+    @Produces(APPLICATION_JSON)
+    public Response updatePersonNameById(UpdatePersonNameInput u){
+        return Response.ok(dbm.updateNameById(u.getId(), u.getName()) + " rows updated").build();
     }
 
-    @Path("/updateteam/{personid}/{teamid}")
-    @GET
+    @Path("/personteamupdate")
+    @POST
     @Consumes(APPLICATION_JSON)
-    @Produces(TEXT_PLAIN)
-    public Response updateTeamByPersonId(@PathParam("personid") int personid, @PathParam("teamid") int teamid){
-        Person p;
+    @Produces(APPLICATION_JSON)
+    public Response updatePersonTeamByPersonId(UpdatePersonTeamInput u){
+        Person p = p = dbm.updateTeamByPersonId(u.getPersonId(), u.getTeamId());
         try {
-            p = dbm.updateTeamByPersonId(personid, teamid);
+
             return Response.ok("PersonID " + p.getPersonid() + " updated").build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -189,24 +188,24 @@ public class RestController {
         }
     }
 
-    @Path("/delete/{id}")
-    @GET
+    @Path("/persons")
+    @DELETE
     @Consumes(APPLICATION_JSON)
-    @Produces(TEXT_PLAIN)
-    public Response deleteById(@PathParam("id") int id){
-        return Response.ok(dbm.deletePersonById(id) + " rows deleted").build();
+    @Produces(APPLICATION_JSON)
+    public Response deletePersonById(IdInput idInput){
+        return Response.ok(dbm.deletePersonById(idInput.getId())).build();
     }
 
-    @Path("/deleteteam/{id}")
-    @GET
+    @Path("/teams")
+    @DELETE
     @Consumes(APPLICATION_JSON)
-    @Produces(TEXT_PLAIN)
-    public Response deleteTeamById(@PathParam("id") int id){
-        dbm.deleteTeamById(id);
+    @Produces(APPLICATION_JSON)
+    public Response deleteTeamById(IdInput idInput){
+        dbm.deleteTeamById(idInput.getId());
         return Response.ok().build();
     }
 
-    @Path("/task")
+    @Path("/tasks")
     @DELETE
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -224,13 +223,34 @@ public class RestController {
         return Response.ok(name + " was (hopefully) added to dcdb/person").build();
     }*/
 
-    @Path("/task")
+    @Path("/tasks")
     @PUT
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response createTask(TaskInput taskInput){
         //System.out.println("TASK@CONTROLLER: " + taskInput.getTaskDescription());
         return Response.ok(dbm.createTask(taskInput.getTaskDescription())).build();
+    }
+
+    @Path("/taskassignment")
+    @POST
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response assignTask(PersonTaskInput uti){
+        try {
+            return Response.ok(dbm.assignTaskToPerson(uti.getPersonId(), uti.getTaskId())).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Response.ok(false).build();
+    }
+
+    @Path("/taskunassignment")
+    @POST
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response unassignTask(PersonTaskInput pti){
+        return Response.ok(dbm.unassignTask(pti.getPersonId(), pti.getTaskId())).build();
     }
 
     private Response sendMessage(String messagebody, boolean isPTP){
@@ -250,19 +270,6 @@ public class RestController {
             ex.printStackTrace();
         }
         return Response.ok().build();
-    }
-
-    @Path("/assigntask")
-    @POST
-    @Consumes(APPLICATION_JSON)
-    @Produces(APPLICATION_JSON)
-    public Response assignTask(UserTaskInput uti){
-        try {
-            return Response.ok(dbm.assignTaskToPerson(uti.getPersonId(), uti.getTaskId())).build();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return Response.ok(false).build();
     }
 
     @Path("/queuemsg")

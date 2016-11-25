@@ -11,60 +11,82 @@ app.controller('mainController', function($scope, $http, $interval) {
     // $scope.idToUpdate = "";
     // $scope.newName = "";
     // $scope.idToDelete=-1;
-    $http.get($scope.restURL + "alltasks").then(function(response){
+    $http.get($scope.restURL + "tasks").then(function(response){
         $scope.taskList = response.data;
     });
 
+    $scope.showPersons = false;
+    $scope.showTeams = false;
+    $scope.showTasks = false;
+    $scope.showMembersList = false;
+    $scope.showTaskMembers = false;
+    $scope.showPersonsToggle = function(){
+        $scope.showPersons = true;
+    }
+
     $scope.addPerson = function(){
-        $http.get($scope.restURL + "add/"+$scope.pname).then(function(response){
+//        $http.get($scope.restURL + "add/"+$scope.pname)
+        $http({
+            method: "PUT",
+            url: $scope.restURL + "persons",
+            data: {"name": $scope.pname}
+        }).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.addResult = response.data;
         });
     };
 
     $scope.addTeam = function(){
-        $http.get($scope.restURL + "addteam/"
-            + $scope.tname + "/" + $scope.shorttname).then(function(response){
+//        $http.get($scope.restURL + "addteam/" + $scope.tname + "/" + $scope.shorttname).
+        $http({
+            method: "PUT",
+            url: $scope.restURL + "teams",
+            data: {"name": $scope.tname, "shortName": $scope.shorttname}
+        }).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.addTeamResult = response.data;
         });
     };
 
-    $scope.getNameById = function(){
+    $scope.getPersonById = function(){
 
-        $http.get($scope.restURL + "get/"+$scope.searchedId).then(function(response){
+        $http.get($scope.restURL + "persons/"+$scope.searchedId).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.searchResult = response.data;
         });
     };
 
-    $scope.getAllNames = function () {
-        $http.get($scope.restURL + "get/all").then(function(response){
+    $scope.getAllPersons = function () {
+        $http.get($scope.restURL + "persons").then(function(response){
             // $http.get("/api/get/all").then(function(response){
             $scope.dbReply = response.statusText;
             $scope.personList = response.data;
+            $scope.showPersons = ($scope.personList.length > 0) ? true : false;
         });
     };
 
     $scope.getAllTeams = function () {
-        $http.get($scope.restURL + "get/allteams").then(function(response){
+        $http.get($scope.restURL + "teams").then(function(response){
             // $http.get("/api/get/all").then(function(response){
             $scope.dbReply = response.statusText;
             $scope.teamList = response.data;
+            $scope.showTeams = $scope.teamList.length > 0 ? true : false;
         });
     };
 
     $scope.getAllTasks = function(){
-        $http.get($scope.restURL + "alltasks").then(function(response){
+        $http.get($scope.restURL + "tasks").then(function(response){
             $scope.dbReply = response.statusText;
-            $scope.taskList = response.data
+            $scope.taskList = response.data;
+            $scope.showTasks = response.data.length > 0 ? true : false;
         });
-    }
+    };
 
-    $scope.getMembersList = function () {
-        $http.get($scope.restURL + "getmembers/" + $scope.membersListById).then(function(response){
+    $scope.getTeamMembers = function () {
+        $http.get($scope.restURL + "teammembers/" + $scope.membersListById).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.getMembersListResult = response.data;
+            $scope.showMembersList = $scope.getMembersListResult.length > 0 ? true : false;
         });
     };
 
@@ -72,42 +94,103 @@ app.controller('mainController', function($scope, $http, $interval) {
         $http.get($scope.restURL + "taskmembers/" + $scope.membersListByTaskId).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.taskMembersResult = response.data;
+            $scope.showTaskMembers = $scope.taskMembersResult.length > 0 ? true : false;
         });
     };
 
-    $scope.updateNameById = function () {
-
-        $http.get($scope.restURL + "update/"
-            + $scope.idToUpdate + '/' + $scope.newName).then(function(response){
+    $scope.updatePersonNameById = function () {
+        $http({
+            method: "POST",
+            url: $scope.restURL + "personnameupdate",
+            data: {"id": $scope.idToUpdate, "name": $scope.newName}
+        }).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.updateResult = response.data;
         });
     };
 
-    $scope.updateTeamByPersonId = function () {
-        $http.get($scope.restURL + "updateteam/"
-            + $scope.idToUpdate2 + '/' + $scope.newTeamId).then(function(response){
+    $scope.updatePersonsTeam = function () {
+        $http({
+            method: "POST",
+            url: $scope.restURL + "personteamupdate",
+            data: {"personId": $scope.idToUpdate2, "teamId": $scope.newTeamId}
+        }).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.updateTeamResult = response.data;
         });
     };
 
-
-    $scope.deleteById = function(){
-        $http.get($scope.restURL + "delete/"
-            + $scope.idToDelete).then(function(response){
+    $scope.deletePersonById = function(){
+        $http({
+            method: "DELETE",
+            url: $scope.restURL + "persons",
+            data: {"id": $scope.idToDelete},
+            headers: {"Content-Type": "application/json"}
+        }).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.deleteResult = response.data;
         });
     };
 
     $scope.deleteTeamById = function(){
-        $http.get($scope.restURL + "deleteteam/"
-            + $scope.teamIdToDelete).then(function(response){
+        $http({
+            method: "DELETE",
+            url: $scope.restURL + "teams",
+            data: {"id": $scope.teamIdToDelete},
+            headers: {"Content-Type": "application/json"}
+        }).then(function(response){
             $scope.dbReply = response.statusText;
             $scope.deleteTeamResult = response.data;
         });
     };
+
+    $scope.deleteTask = function(){
+        $http({
+            method: "DELETE",
+            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/tasks",
+            data: {"id": $scope.taskIdToDelete},
+            headers: {"Content-Type": "application/json"}
+        }).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.deleteTaskResult = response.data;
+        });
+    };
+
+    $scope.createTask = function(){
+        $http({
+            method: "PUT",
+            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/tasks",
+            data: { "taskDescription": $scope.newTaskInput },
+            headers: {"Content-Type": "application/json"}
+        }).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.newTaskResult = response.data;
+        });
+    };
+
+    $scope.assignTask = function(){
+        $http({
+            method: "POST",
+            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/taskassignment",
+            data: {"personId": $scope.personId, "taskId": $scope.taskToAssign.taskId},
+            headers: {"Content-Type": "application/json"}
+        }).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.assignTaskResult = response.data;
+        });
+    };
+
+    $scope.unassignTask = function(){
+        $http({
+            method: "POST",
+            url: $scope.restURL + "taskunassignment",
+            data: {"personId": $scope.personId, "taskId": $scope.taskToUnassign.taskId},
+            headers: {"Content-Type": "application/json"}
+        }).then(function(response){
+            $scope.dbReply = response.statusText;
+            $scope.unassignTaskResult = response.data;
+        });
+    }
 
     $scope.toMessageQueue = function(){
         $http({
@@ -134,42 +217,6 @@ app.controller('mainController', function($scope, $http, $interval) {
         });
     };
 
-    $scope.createTask = function(){
-        $http({
-            method: "PUT",
-            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/task",
-            data: { "taskDescription": $scope.newTaskInput },
-            headers: {"Content-Type": "application/json"}
-        }).then(function(response){
-            $scope.dbReply = response.statusText;
-            $scope.newTaskResult = response.data;
-        });
-    };
-
-    $scope.assignTask = function(){
-        $http({
-            method: "POST",
-            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/assigntask",
-            data: {"personId": $scope.personId, "taskId": $scope.taskToAssign.taskId} ,
-            headers: {"Content-Type": "application/json"}
-        }).then(function(response){
-            $scope.dbReply = response.statusText;
-            $scope.assignTaskResult = response.data;
-        });
-    };
-
-    $scope.deleteTask = function(){
-        $http({
-            method: "DELETE",
-            url: "http://localhost:8080/Tee-1.0-SNAPSHOT/api/task",
-            data: {"id": $scope.taskIdToDelete},
-            headers: {"Content-Type": "application/json"}
-        }).then(function(response){
-            $scope.dbReply = response.statusText;
-            $scope.deleteTaskResult = response.data;
-        });
-    };
-
     $scope.orderPersonsTable = function(x){
         $scope.reverse = ($scope.orderPersonsBy === x) ? !$scope.reverse : false;
         $scope.orderPersonsBy = x;
@@ -188,6 +235,5 @@ app.controller('mainController', function($scope, $http, $interval) {
     $interval(function(){
         $scope.theTime = new Date().toString();
     }, 1000);
-
 
 });
